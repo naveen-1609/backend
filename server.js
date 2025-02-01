@@ -1,29 +1,28 @@
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config(); // Load environment variables from .env
+require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 5000; // ✅ Use Render-assigned port
+const PORT = process.env.PORT || 5000;
 
-app.use(cors()); // ✅ Allow requests from frontend
-app.use(express.json()); // ✅ Parse JSON requests
+// ✅ Enable CORS Properly
+app.use(cors({ origin: "*", methods: "GET, POST", allowedHeaders: "Content-Type" }));
+app.use(express.json());
 
-// ✅ Route to securely send OpenAI API key to frontend
+// ✅ API Route to Send API Key
 app.get("/api/key", (req, res) => {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: "API key is missing!" });
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(500).json({ error: "API Key is missing in the backend." });
   }
-  res.json({ apiKey: apiKey.trim() });
+  res.json({ apiKey: process.env.OPENAI_API_KEY });
 });
 
-// ✅ Default route (Check if backend is working)
+// ✅ Default Route to Test Backend
 app.get("/", (req, res) => {
-  res.send("✅ Backend is working!");
+  res.send("✅ Backend is working with CORS enabled!");
 });
 
-
-// ✅ Start the server
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ Server running on port ${PORT}`);
+// ✅ Start Server
+app.listen(PORT, () => {
+  console.log(`✅ Server running on http://localhost:${PORT}`);
 });
